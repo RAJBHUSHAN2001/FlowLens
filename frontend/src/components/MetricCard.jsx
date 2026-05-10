@@ -27,6 +27,23 @@ export default function MetricCard({ title, value, unit, type, description }) {
     rose: "text-rose-500 bg-rose-500/10 border-rose-500/20"
   };
 
+  const calculateProgress = () => {
+    const v = parseFloat(value);
+    // Lower is better (Time-based metrics)
+    if (type === 'leadTime' || type === 'cycleTime') {
+      return Math.max(10, Math.min(100, 100 - (v * 10))); 
+    }
+    // Higher is better (Volume-based metrics)
+    if (type === 'prCount' || type === 'deployFreq') {
+      return Math.max(10, Math.min(100, v * 25));
+    }
+    // Lower is better (Quality/Bug rate)
+    if (type === 'bugRate') {
+      return Math.max(10, Math.min(100, 100 - v));
+    }
+    return 70;
+  };
+
   return (
     <motion.div 
       whileHover={{ y: -4 }}
@@ -61,7 +78,8 @@ export default function MetricCard({ title, value, unit, type, description }) {
         <div className="flex-1 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
           <motion.div 
             initial={{ width: 0 }}
-            animate={{ width: '70%' }}
+            animate={{ width: `${calculateProgress()}%` }}
+            transition={{ duration: 1, ease: "easeOut" }}
             className={`h-full bg-${color}-500`}
           />
         </div>
